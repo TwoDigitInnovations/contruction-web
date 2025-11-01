@@ -14,7 +14,7 @@ import Navbar from "@/Components/Navbar";
 
 const Layout = ({ children, loader, toaster, constant, open }) => {
 
-   const [navbarOpen, setNavbarOpen] = useState(false);
+  const [navbarOpen, setNavbarOpen] = useState(false);
   const router = useRouter();
 
   const goToTop = () => {
@@ -39,18 +39,18 @@ const Layout = ({ children, loader, toaster, constant, open }) => {
       <ToastContainer />
       <div>
         <div className="min-h-screen flex-col bg-white relative">
-          
+
           {/* Navbar - Higher z-index with inline style */}
-          <div 
-            className="fixed w-full top-0" 
-            style={{ zIndex: 99999 }}
+          <div
+            className="fixed w-full top-0"
+            style={{ zIndex: 50 }}
           >
-             <Navbar
-    loader={loader}
-    toaster={toast}
-    isOpen={navbarOpen}
-    setIsOpen={setNavbarOpen}
-  />
+            <Navbar
+              loader={loader}
+              toaster={toast}
+              isOpen={navbarOpen}
+              setIsOpen={setNavbarOpen}
+            />
           </div>
 
           {/* Main content with proper spacing */}
@@ -73,23 +73,23 @@ const Layout = ({ children, loader, toaster, constant, open }) => {
             </main>
           </div> */}
           <div className="flex-1 pt-20">
-  {open && (
-    <div
-      className="h-screen w-screen fixed flex justify-center items-center backdrop-blur-sm"
-      style={{ zIndex: 9998 }}
-    >
-      <img
-        src="/book1.gif"
-        className="absolute rounded-full h-60 w-60 object-contain"
-        dir="rtl"
-      />
-    </div>
-  )}
-                  
-  <main className="h-full flex-1">
-    {children}
-  </main>
-</div>
+            {open && (
+              <div
+                className="h-screen w-screen fixed flex justify-center items-center backdrop-blur-sm"
+                style={{ zIndex: 9998 }}
+              >
+                <img
+                  src="/book1.gif"
+                  className="absolute rounded-full h-60 w-60 object-contain"
+                  dir="rtl"
+                />
+              </div>
+            )}
+
+            <main className=" h-full flex-1 z-0">
+              {children}
+            </main>
+          </div>
 
           <Footer loader={loader} toaster={toast} />
         </div>

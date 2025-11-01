@@ -1,29 +1,25 @@
-import { FaCheckCircle } from "react-icons/fa";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import ClintEnquery from "../clintEnquery";
 import { Api } from "@/services/service";
+import LocationPicker from "@/Components/GetLocationButton";
+import { useLocation } from "@/Components/context/LocationContext";
 
-function shippingAddress() {
+function ShippingAddress(props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  
-  const [addressData, setAddressData] = useState({
-    username: '',
-    email: '',
-    state: '',
-    address: '',
-    pincode: '',
-    phone: '',
-    city: '',
-    country: '',
-    scheduleDate: ''
-  });
+  const { setProfileLocation, location, source, fetchCurrentLocation } = useLocation();
 
-  // Get product data from router query or props
-  const productData = router.query;
+  const [addressData, setAddressData] = useState({
+    username: "",
+    email: "",
+    state: "",
+    address: "",
+    pincode: "",
+    phone: "",
+    city: "",
+    country: "",
+  });
 
   useEffect(() => {
     fetchProfileData();
@@ -31,21 +27,19 @@ function shippingAddress() {
 
   const fetchProfileData = async () => {
     setLoading(true);
-    
     try {
       const response = await Api("get", "getProfile", {}, router);
-      
       if (response?.status) {
         setAddressData({
-          username: response?.data?.username || '',
-          address: response?.data?.address || productData?.useradd || '',
-          pincode: response?.data?.pincode || '',
-          phone: response?.data?.phone || '',
-          city: response?.data?.city || '',
-          country: response?.data?.country || '',
-          email: response?.data?.email || '',
-          state: response?.data?.state || '',
-          scheduleDate: ''
+          ...response.data,
+          username: response?.data?.username || "",
+          address: response?.data?.address || "",
+          pincode: response?.data?.pincode || "",
+          phone: response?.data?.phone || "",
+          city: response?.data?.city || "",
+          country: response?.data?.country || "",
+          email: response?.data?.email || "",
+          state: response?.data?.state || "",
         });
       }
     } catch (error) {
@@ -56,274 +50,218 @@ function shippingAddress() {
   };
 
   const handleInputChange = (field, value) => {
-    setAddressData({
-      ...addressData,
-      [field]: value
-    });
+
+    if (field === "phone") {
+      if (!/^\d*$/.test(value)) return;
+      if (value.length > 10) return; // Limit to 10 digits
+    }
+    setAddressData({ ...addressData, [field]: value });
   };
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const updateProfile = async (e) => {
+    e.preventDefault();
+    setSubmitted(true);
 
-  const handleSubmit = async () => {
-    // Validation
-    if (
-      !addressData.username ||
-      !addressData.address ||
-      !addressData.pincode ||
-      !addressData.phone ||
-      !addressData.city ||
-      !addressData.country ||
-      !addressData.email ||
-      !addressData.state ||
-      !addressData.scheduleDate
-    ) {
-      setSubmitted(true);
+    // ✅ Validation for required fields
+    const { username, phone, address } = addressData;
+    if (!username || !phone || !address) {
+      props.toaster({
+        type: "error",
+        message: "Please fill all required fields.",
+      });
       return;
     }
 
-    if (!validateEmail(addressData.email.trim())) {
-      // Show error toast for invalid email
-      console.log("Invalid email");
+    // ✅ Check phone format
+    if (phone.length !== 10) {
+      props.toaster({
+        type: "error",
+        message: "Phone number must be 10 digits.",
+      });
       return;
     }
 
-    setLoading(true);
-
-    const orderData = {
+    const data = {
       ...addressData,
-      price: productData.price,
-      product: productData.productid,
-      productname: productData.productname,
-      vendor: productData.posted_by,
-      sheduledate: addressData.scheduleDate
-    };
-
-    // Add location if available
-    if (productData?.location?.latitude && productData?.location?.longitude) {
-      orderData.location = {
-        type: 'Point',
-        coordinates: [productData.location.longitude, productData.location.latitude],
-      };
-    }
-
-    if (productData.description) {
-      orderData.description = productData.description;
+      location: JSON.stringify(addressData.location)
     }
 
     try {
-      const response = await Api("post", "createOrder", orderData, router);
-      
-      if (response?.status) {
-        setShowModal(true);
-        setSubmitted(false);
-        // Reset form
-        setAddressData({
-          username: '',
-          address: '',
-          pincode: '',
-          phone: '',
-          city: '',
-          country: '',
-          email: '',
-          state: '',
-          scheduleDate: ''
-        });
-      } else {
-        console.log("Order creation failed:", response?.message);
+      props.loader(true);
+      const res = await Api("post", "updateProfile", data); 
+      if (res?.status) {
+        props.toaster({ type: "success", message: "Profile updated!" });
+        fetchProfileData()
+        setProfileLocation({
+          long: addressData.location.coordinates[0],
+          lat: addressData.location.coordinates[1],
+          address: addressData.address
+        })
       }
-    } catch (error) {
-      console.log("Order creation error:", error);
+      else {
+        props.toaster({ type: "error", message: res?.data?.message });
+      }
+    } catch (err) {
+      props.toaster({ type: "error", message: err?.message });
     } finally {
-      setLoading(false);
+      props.loader(false);
     }
   };
 
-  const closeModal = () => {
-    setShowModal(false);
-    router.push("/Order/cart");
-  };
+  useEffect(() => {
+    const loadLocation = async () => {
+      let loc = location;
+      console.log(loc);
+      if (!loc) {
+        loc = await fetchCurrentLocation();
+      }
+    }
 
+
+
+    loadLocation();
+  }, [location]);
   return (
     <div>
-      <div>
-        <div className="relative bg-[url('/Image/construction.jpg')] bg-cover bg-center h-screen w-full">
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
-          <div className="absolute inset-0 flex flex-col justify-center items-center z-10">
-            <p className="text-center font-semibold text-4xl md:text-5xl lg:text-6xl text-white">
-              SHIPPING ADDRESS
-            </p>
-          </div>
+      {/* Hero Section */}
+      <div className="relative bg-[url('/Image/construction.jpg')] bg-cover bg-center h-[50vh] sm:h-[60vh] md:h-screen w-full">
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
+        <div className="absolute inset-0 flex flex-col justify-center items-center z-10">
+          <p className="text-center font-semibold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white">
+            SHIPPING ADDRESS
+          </p>
         </div>
       </div>
 
-      <div className="bg-custom-black py-10">
-        <div className="border bg-gray-700 border-gray-500 rounded px-5 md:px-10 py-5 w-[90%] md:w-[50%] mx-auto">
-          <div className="pt-5">
-            <p className="text-center text-white mb-5">Shipping address</p>
-            
-            <label className="text-white">Full Name</label>
-            <input
-              className="w-full mt-3 mb-3 px-3 py-3 rounded text-custom-black"
-              type="text"
-              required
-              placeholder="Name...."
-              value={addressData.username}
-              onChange={(e) => handleInputChange('username', e.target.value)}
-            />
-            {submitted && !addressData.username && (
-              <p className="text-red-500 text-sm mb-3">Name is required</p>
-            )}
+      {/* Form Section */}
+      <div className="bg-custom-black py-10 px-4">
+        <div className="border bg-gray-700 border-gray-500 rounded px-5 sm:px-6 py-6 max-w-5xl mx-auto">
+          <p className="text-center text-2xl md:text-3xl text-white mb-5">
+            Shipping Address
+          </p>
 
-            <label className="mt-3 text-white">Mobile Number</label>
-            <input
-              className="w-full mt-3 mb-3 px-3 py-3 rounded text-custom-black"
-              type="number"
-              required
-              placeholder="Mobile Number"
-              value={addressData.phone}
-              onChange={(e) => handleInputChange('phone', e.target.value)}
-            />
-            {submitted && !addressData.phone && (
-              <p className="text-red-500 text-sm mb-3">Mobile number is required</p>
-            )}
-
-            <label className="mt-3 text-white">Email</label>
-            <input
-              className="w-full mt-3 mb-3 px-3 py-3 rounded text-custom-black"
-              type="email"
-              required
-              placeholder="demo@gmail.com"
-              value={addressData.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
-            />
-            {submitted && !addressData.email && (
-              <p className="text-red-500 text-sm mb-3">Email is required</p>
-            )}
-
-            <label className="mt-3 text-white">Address</label>
-            <input
-              className="w-full mt-3 mb-3 px-3 py-3 rounded text-custom-black"
-              type="text"
-              required
-              placeholder="Address...."
-              value={addressData.address}
-              onChange={(e) => handleInputChange('address', e.target.value)}
-            />
-            {submitted && !addressData.address && (
-              <p className="text-red-500 text-sm mb-3">Address is required</p>
-            )}
-
-            <label className="mt-3 text-white">City</label>
-            <input
-              className="w-full mt-3 mb-3 px-3 py-3 rounded text-custom-black"
-              type="text"
-              required
-              placeholder="City...."
-              value={addressData.city}
-              onChange={(e) => handleInputChange('city', e.target.value)}
-            />
-            {submitted && !addressData.city && (
-              <p className="text-red-500 text-sm mb-3">City is required</p>
-            )}
-
-            <label className="mt-3 text-white">Country</label>
-            <input
-              className="w-full mt-3 mb-3 px-3 py-3 rounded text-custom-black"
-              type="text"
-              required
-              placeholder="Country...."
-              value={addressData.country}
-              onChange={(e) => handleInputChange('country', e.target.value)}
-            />
-            {submitted && !addressData.country && (
-              <p className="text-red-500 text-sm mb-3">Country is required</p>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <label className="mt-3 text-white">Zip Code</label>
-                <input
-                  className="w-full mt-3 mb-3 px-3 py-3 rounded text-custom-black"
-                  type="number"
-                  required
-                  placeholder="000000"
-                  value={addressData.pincode}
-                  onChange={(e) => handleInputChange('pincode', e.target.value)}
-                />
-                {submitted && !addressData.pincode && (
-                  <p className="text-red-500 text-sm">Zip code is required</p>
-                )}
-              </div>
-              <div>
-                <label className="text-white">State</label>
-                <input
-                  className="w-full mt-3 mb-3 px-3 py-3 rounded text-custom-black"
-                  type="text"
-                  required
-                  placeholder="State...."
-                  value={addressData.state}
-                  onChange={(e) => handleInputChange('state', e.target.value)}
-                />
-                {submitted && !addressData.state && (
-                  <p className="text-red-500 text-sm">State is required</p>
-                )}
-              </div>
-            </div>
-
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Name */}
             <div>
-              <label className="mt-10 text-white">Schedule Delivery</label>
+              <label className="text-white">Full Name</label>
               <input
-                className="w-full mt-3 mb-3 cursor-pointer px-3 py-3 rounded text-custom-black"
-                type="date"
+                className="w-full mt-2 px-3 py-2 rounded text-custom-black"
+                type="text"
                 required
-                value={addressData.scheduleDate}
-                onChange={(e) => handleInputChange('scheduleDate', e.target.value)}
+                placeholder="Name..."
+                value={addressData.username}
+                onChange={(e) =>
+                  handleInputChange("username", e.target.value)
+                }
               />
-              {submitted && !addressData.scheduleDate && (
-                <p className="text-red-500 text-sm mb-3">Schedule date is required</p>
+              {submitted && !addressData.username && (
+                <p className="text-red-500 text-sm mt-1">Name is required</p>
               )}
             </div>
 
-            <button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="bg-yellow-600 mb-5 rounded text-white font-semibold w-full px-3 py-2 mt-8 disabled:opacity-50"
-            >
-              {loading ? 'Processing...' : 'Confirm'}
-            </button>
-          </div>
-        </div>
+            {/* Phone */}
+            <div>
+              <label className="text-white">Mobile Number</label>
+              <input
+                className="w-full mt-2 px-3 py-2 rounded text-custom-black"
+                type="text"
+                required
+                placeholder="10-digit number"
+                value={addressData.phone}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+              />
+              {submitted && !addressData.phone && (
+                <p className="text-red-500 text-sm mt-1">
+                  Mobile number is required
+                </p>
+              )}
+            </div>
 
-        <ClintEnquery />
-      </div>
+            {/* Email */}
+            <div>
+              <label className="text-white">Email</label>
+              <input
+                className="w-full mt-2 px-3 py-2 rounded text-custom-black"
+                type="email"
+                placeholder="demo@gmail.com"
+                value={addressData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+              />
+            </div>
 
-      {/* Success Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-md mx-4">
-            <div className="text-center">
-              <FaCheckCircle className="text-green-500 text-6xl mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                Your Order is Confirmed.
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Thanks for your Order
-              </p>
-              <button
-                onClick={closeModal}
-                className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors"
-              >
-                OK
-              </button>
+            {/* City */}
+            <div>
+              <label className="text-white">City</label>
+              <input
+                className="w-full mt-2 px-3 py-2 rounded text-custom-black"
+                type="text"
+                placeholder="City..."
+                value={addressData.city}
+                onChange={(e) => handleInputChange("city", e.target.value)}
+              />
+            </div>
+
+            {/* Country */}
+            <div>
+              <label className="text-white">Country</label>
+              <input
+                className="w-full mt-2 px-3 py-2 rounded text-custom-black"
+                type="text"
+                placeholder="Country..."
+                value={addressData.country}
+                onChange={(e) => handleInputChange("country", e.target.value)}
+              />
+            </div>
+
+            {/* Pincode */}
+            <div>
+              <label className="text-white">Zip Code</label>
+              <input
+                className="w-full mt-2 px-3 py-2 rounded text-custom-black"
+                type="text"
+                placeholder="000000"
+                value={addressData.pincode}
+                onChange={(e) => handleInputChange("pincode", e.target.value)}
+              />
+            </div>
+
+            {/* State */}
+            <div>
+              <label className="text-white">State</label>
+              <input
+                className="w-full mt-2 px-3 py-2 rounded text-custom-black"
+                type="text"
+                placeholder="State..."
+                value={addressData.state}
+                onChange={(e) => handleInputChange("state", e.target.value)}
+              />
+            </div>
+
+            {/* Address (with Location Picker) */}
+            <div>
+              <label className="text-white">Address</label>
+              <LocationPicker
+                createProject={addressData}
+                setCreateProject={setAddressData}
+              />
+              {submitted && !addressData.address && (
+                <p className="text-red-500 text-sm mt-1">Address is required</p>
+              )}
             </div>
           </div>
+
+          {/* Submit Button */}
+          <button
+            onClick={updateProfile}
+            disabled={loading}
+            className="bg-yellow-600 w-full text-white font-semibold rounded px-3 py-3 mt-8 hover:bg-yellow-700 transition disabled:opacity-50"
+          >
+            {loading ? "Processing..." : "Update Shipping Address"}
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
 
-export default shippingAddress;
+export default ShippingAddress;

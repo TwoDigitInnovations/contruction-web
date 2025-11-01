@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
-import { GoogleMap, LoadScript, Marker, Autocomplete ,DirectionsRenderer,DirectionsService} from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Marker, Autocomplete, DirectionsRenderer, DirectionsService } from '@react-google-maps/api';
 
 
 const libraries = ['places'];
@@ -17,10 +17,10 @@ function orderCategory() {
   const [selectedShop, setSelectedShop] = useState(null);
   const [mapInstance, setMapInstance] = useState(null);
   const [directionsResponse, setDirectionsResponse] = useState(null);
-const [distance, setDistance] = useState("");
-const [duration, setDuration] = useState("");
+  const [distance, setDistance] = useState("");
+  const [duration, setDuration] = useState("");
 
-  
+
   // Autocomplete refs
   const shopAutocompleteRef = useRef(null);
   const clientAutocompleteRef = useRef(null);
@@ -40,32 +40,32 @@ const [duration, setDuration] = useState("");
 
 
 
-const calculateRoute = useCallback(async () => {
-  if (!shopLocation || !clientLocation || !window.google) return;
+  const calculateRoute = useCallback(async () => {
+    if (!shopLocation || !clientLocation || !window.google) return;
 
-  const directionsService = new window.google.maps.DirectionsService();
-  
-  try {
-    const results = await directionsService.route({
-      origin: shopLocation,
-      destination: clientLocation,
-      travelMode: window.google.maps.TravelMode.DRIVING,
-    });
+    const directionsService = new window.google.maps.DirectionsService();
 
-    setDirectionsResponse(results);
-    setDistance(results.routes[0].legs[0].distance.text);
-    setDuration(results.routes[0].legs[0].duration.text);
-  } catch (error) {
-    console.error('Error calculating route:', error);
-  }
-}, [shopLocation, clientLocation]);
+    try {
+      const results = await directionsService.route({
+        origin: shopLocation,
+        destination: clientLocation,
+        travelMode: window.google.maps.TravelMode.DRIVING,
+      });
 
-// 4. useEffect add karo route calculate karne ke liye
-useEffect(() => {
-  if (shopLocation && clientLocation && isLoaded) {
-    calculateRoute();
-  }
-}, [shopLocation, clientLocation, isLoaded, calculateRoute]);
+      setDirectionsResponse(results);
+      setDistance(results.routes[0].legs[0].distance.text);
+      setDuration(results.routes[0].legs[0].duration.text);
+    } catch (error) {
+      console.error('Error calculating route:', error);
+    }
+  }, [shopLocation, clientLocation]);
+
+  // 4. useEffect add karo route calculate karne ke liye
+  useEffect(() => {
+    if (shopLocation && clientLocation && isLoaded) {
+      calculateRoute();
+    }
+  }, [shopLocation, clientLocation, isLoaded, calculateRoute]);
 
 
 
@@ -101,60 +101,60 @@ useEffect(() => {
     }
   };
 
- useEffect(() => {
-  console.log('Router query received:', router.query);
-  
-  // Set shops data
-  if (router.query.shopsData) {
-    try {
-      const shops = JSON.parse(router.query.shopsData);
-      setShopsData(shops);
-      console.log('Received shops data:', shops);
-    } catch (error) {
-      console.error('Error parsing shops data:', error);
+  useEffect(() => {
+    console.log('Router query received:', router.query);
+
+    // Set shops data
+    if (router.query.shopsData) {
+      try {
+        const shops = JSON.parse(router.query.shopsData);
+        setShopsData(shops);
+        console.log('Received shops data:', shops);
+      } catch (error) {
+        console.error('Error parsing shops data:', error);
+      }
     }
-  }
-    
-   if (router.query.selectedShop) {
-    try {
-      const shop = JSON.parse(router.query.selectedShop);
-      setSelectedShop(shop);
-      
-      const shopLoc = {
-        lat: shop.location.coordinates[1], // latitude
-        lng: shop.location.coordinates[0]  // longitude
-      };
-      setShopLocation(shopLoc);
-      setShopAddress(shop.shop_address || shop.shop_name || 'Selected Shop');
-      console.log('Shop location auto-populated:', shopLoc);
-    } catch (error) {
-      console.error('Error parsing selected shop:', error);
+
+    if (router.query.selectedShop) {
+      try {
+        const shop = JSON.parse(router.query.selectedShop);
+        setSelectedShop(shop);
+
+        const shopLoc = {
+          lat: shop.location.coordinates[1], // latitude
+          lng: shop.location.coordinates[0]  // longitude
+        };
+        setShopLocation(shopLoc);
+        setShopAddress(shop.shop_address || shop.shop_name || 'Selected Shop');
+        console.log('Shop location auto-populated:', shopLoc);
+      } catch (error) {
+        console.error('Error parsing selected shop:', error);
+      }
     }
-  }
-  
-    
+
+
     // Auto-populate client location from delivery location (jo user ne select kiya tha)
-   if (router.query.lat && router.query.lng && router.query.address) {
-    const clientLoc = {
-      lat: parseFloat(router.query.lat),
-      lng: parseFloat(router.query.lng)
-    };
-    setClientLocation(clientLoc);
-    setClientAddress(decodeURIComponent(router.query.address));
-    console.log('Client location auto-populated:', clientLoc);
-    console.log('Client address auto-populated:', decodeURIComponent(router.query.address));
-  }
-  // CURRENT LOCATION के लिए अगर client location set नहीं है तो current location use करो
-  else if (router.query.currentLat && router.query.currentLng) {
-    const currentLoc = {
-      lat: parseFloat(router.query.currentLat),
-      lng: parseFloat(router.query.currentLng)
-    };
-    setClientLocation(currentLoc);
-    console.log('Current location auto-populated as client location:', currentLoc);
-  }
-  
-}, [router.query]);
+    if (router.query.lat && router.query.lng && router.query.address) {
+      const clientLoc = {
+        lat: parseFloat(router.query.lat),
+        lng: parseFloat(router.query.lng)
+      };
+      setClientLocation(clientLoc);
+      setClientAddress(decodeURIComponent(router.query.address));
+      console.log('Client location auto-populated:', clientLoc);
+      console.log('Client address auto-populated:', decodeURIComponent(router.query.address));
+    }
+    // CURRENT LOCATION के लिए अगर client location set नहीं है तो current location use करो
+    else if (router.query.currentLat && router.query.currentLng) {
+      const currentLoc = {
+        lat: parseFloat(router.query.currentLat),
+        lng: parseFloat(router.query.currentLng)
+      };
+      setClientLocation(currentLoc);
+      console.log('Current location auto-populated as client location:', currentLoc);
+    }
+
+  }, [router.query]);
 
   // Handle LoadScript onLoad
   const handleScriptLoad = () => {
@@ -165,7 +165,7 @@ useEffect(() => {
   const onMapClick = useCallback((event) => {
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
-    
+
     const location = { lat: lat, lng: lng };
 
     // Reverse geocoding to get address
@@ -176,7 +176,7 @@ useEffect(() => {
         (results, status) => {
           if (status === 'OK' && results[0]) {
             const address = results[0].formatted_address;
-            
+
             if (mapMode === "shop") {
               setShopLocation(location);
               setShopAddress(address);
@@ -189,31 +189,31 @@ useEffect(() => {
       );
     }
   }, [mapMode]);
-  
- useEffect(() => {
- 
-  if (router.query.currentLat && router.query.currentLng && !clientLocation) {
-    const currentLoc = {
-      lat: parseFloat(router.query.currentLat),
-      lng: parseFloat(router.query.currentLng)
-    };
-    setClientLocation(currentLoc);
-    console.log('Current location set as client location:', currentLoc);
-   
-    if (isLoaded && window.google && window.google.maps) {
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode(
-        { location: currentLoc },
-        (results, status) => {
-          if (status === 'OK' && results[0]) {
-            setClientAddress(results[0].formatted_address);
-            console.log('Current location address set:', results[0].formatted_address);
+
+  useEffect(() => {
+
+    if (router.query.currentLat && router.query.currentLng && !clientLocation) {
+      const currentLoc = {
+        lat: parseFloat(router.query.currentLat),
+        lng: parseFloat(router.query.currentLng)
+      };
+      setClientLocation(currentLoc);
+      console.log('Current location set as client location:', currentLoc);
+
+      if (isLoaded && window.google && window.google.maps) {
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode(
+          { location: currentLoc },
+          (results, status) => {
+            if (status === 'OK' && results[0]) {
+              setClientAddress(results[0].formatted_address);
+              console.log('Current location address set:', results[0].formatted_address);
+            }
           }
-        }
-      );
+        );
+      }
     }
-  }
-}, [router.query, isLoaded, clientLocation]);
+  }, [router.query, isLoaded, clientLocation]);
 
   return (
     <div>
@@ -230,15 +230,15 @@ useEffect(() => {
 
       <div className="bg-custom-black py-10">
         <p className="text-center text-3xl font-semibold pb-10 text-white">Selected Shop</p>
-        
+
         <div>
           <div className="md:w-[80%] w-full mx-auto">
-            <LoadScript 
+            <LoadScript
               googleMapsApiKey={process.env.NEXT_PUBLIC_MAP_API_KEY}
               libraries={libraries}
               onLoad={handleScriptLoad}
-              loadingElement={<div style={{height: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#374151', borderRadius: '12px'}}>
-                <p style={{color: 'white'}}>Loading Map...</p>
+              loadingElement={<div style={{ height: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#374151', borderRadius: '12px' }}>
+                <p style={{ color: 'white' }}>Loading Map...</p>
               </div>}
             >
               <GoogleMap
@@ -248,7 +248,7 @@ useEffect(() => {
                   height: '500px',
                   borderRadius: '12px'
                 }}
-               center={shopLocation || clientLocation || center}
+                center={shopLocation || clientLocation || center}
                 zoom={12}
                 onClick={onMapClick}
                 options={{
@@ -435,7 +435,7 @@ useEffect(() => {
                     title="Shop Location"
                   />
                 )}
-                
+
                 {/* Client Marker (Red) */}
                 {clientLocation && (
                   <Marker
@@ -457,29 +457,29 @@ useEffect(() => {
 
 
                 {directionsResponse && (
-  <DirectionsRenderer 
-    directions={directionsResponse}
-    options={{
-      suppressMarkers: true, // Custom markers use kar rahe hain
-      polylineOptions: {
-        strokeColor: '#3B82F6',
-        strokeWeight: 4,
-        strokeOpacity: 0.8
-      }
-    }}
-  />
-)}
+                  <DirectionsRenderer
+                    directions={directionsResponse}
+                    options={{
+                      suppressMarkers: true, // Custom markers use kar rahe hain
+                      polylineOptions: {
+                        strokeColor: '#3B82F6',
+                        strokeWeight: 4,
+                        strokeOpacity: 0.8
+                      }
+                    }}
+                  />
+                )}
 
 
               </GoogleMap>
             </LoadScript>
           </div>
         </div>
-        
+
         <p className="my-10 text-center font-semibold text-3xl text-white">
           ORDER CATEGORY
         </p>
-        
+
         <div className="border bg-gray-700 border-gray-500 rounded md:px-10 px-5 py-5 w-[90%] md:w-[450px] mx-auto">
           <div className="pt-3">
             {/* Map Mode Selector */}
@@ -488,21 +488,19 @@ useEffect(() => {
               <div className="flex gap-2">
                 <button
                   onClick={() => setMapMode("shop")}
-                  className={`px-4 py-2 rounded text-sm font-medium ${
-                    mapMode === "shop" 
-                      ? "bg-green-600 text-white" 
+                  className={`px-4 py-2 rounded text-sm font-medium ${mapMode === "shop"
+                      ? "bg-green-600 text-white"
                       : "bg-gray-600 text-gray-300"
-                  }`}
+                    }`}
                 >
                   🏪 Shop Location
                 </button>
                 <button
                   onClick={() => setMapMode("client")}
-                  className={`px-4 py-2 rounded text-sm font-medium ${
-                    mapMode === "client" 
-                      ? "bg-red-600 text-white" 
+                  className={`px-4 py-2 rounded text-sm font-medium ${mapMode === "client"
+                      ? "bg-red-600 text-white"
                       : "bg-gray-600 text-gray-300"
-                  }`}
+                    }`}
                 >
                   👤 Client Location
                 </button>
@@ -529,7 +527,7 @@ useEffect(() => {
             {isLoaded ? (
               <>
                 <Autocomplete
-                  onLoad={(autocomplete) => {shopAutocompleteRef.current = autocomplete}}
+                  onLoad={(autocomplete) => { shopAutocompleteRef.current = autocomplete }}
                   onPlaceChanged={onShopPlaceSelected}
                   options={{
                     componentRestrictions: { country: 'IN' },
@@ -545,9 +543,9 @@ useEffect(() => {
                     onChange={(e) => setShopAddress(e.target.value)}
                   />
                 </Autocomplete>
-                
+
                 <Autocomplete
-                  onLoad={(autocomplete) => {clientAutocompleteRef.current = autocomplete}}
+                  onLoad={(autocomplete) => { clientAutocompleteRef.current = autocomplete }}
                   onPlaceChanged={onClientPlaceSelected}
                   options={{
                     componentRestrictions: { country: 'IN' },
@@ -574,7 +572,7 @@ useEffect(() => {
                   value={shopAddress}
                   onChange={(e) => setShopAddress(e.target.value)}
                 />
-                
+
                 <input
                   className="w-full mt-6 px-3 py-3 placeholder:text-gray-500 rounded text-black"
                   type="text"
@@ -585,7 +583,7 @@ useEffect(() => {
                 />
               </>
             )}
-            
+
             <textarea
               className="w-full mt-6 px-3 py-3 placeholder:text-gray-500 rounded text-black resize-none"
               rows="4"

@@ -5,25 +5,25 @@ import Image from "next/image";
 
 function Footer() {
   return (
-    <footer className="bg-custom-black border-b border-white text-white px-5">
-      <div className="max-w-full  mx-auto w-full px-4 sm:px-6 md:px-10">
+    <footer className="bg-custom-black border-b border-white text-white ">
+      <div className="max-w-7xl mx-auto px-4 md:px-0">
         {/* Top Section */}
         <div className="flex flex-col items-center md:flex-row md:justify-between py-6  ">
           {/* Logo */}
-         <Image src="/Image/logo.png" width={100} height={100}/>
+          <Image src="/Image/logo.png" width={100} height={100} />
 
           {/* Newsletter Subscription */}
-         <div className="flex flex-col items-center gap-4 mt-4 md:mt-0 md:flex-row md:gap-3">
-  <p className="text-center text-nowrap">Subscribe to Our Newsletter:</p>
-  <div className="flex items-center border-b border-gray-500">
-    <input
-      type="email"
-      placeholder="Enter your email address"
-      className="bg-transparent outline-none text-white placeholder-gray-400 px-2 py-1 w-64"
-    />
-    <FaArrowRight className="ml-2 cursor-pointer text-yellow-500" />
-  </div>
-</div>
+          <div className="flex flex-col items-center gap-4 mt-4 md:mt-0 md:flex-row md:gap-3">
+            <p className="text-center text-nowrap">Subscribe to Our Newsletter:</p>
+            <div className="flex items-center border-b border-gray-500">
+              <input
+                type="email"
+                placeholder="Enter your email address"
+                className="bg-transparent outline-none text-white placeholder-gray-400 px-2 py-1 w-64"
+              />
+              <FaArrowRight className="ml-2 cursor-pointer text-yellow-500" />
+            </div>
+          </div>
         </div>
 
         {/* Middle Section */}
@@ -81,12 +81,12 @@ function Footer() {
                   Project
                 </Link>
               </li>
-               <li>
+              <li>
                 <Link href="/terms" className="hover:text-yellow-500">
                   Terms & Conditions
                 </Link>
               </li>
-               <li>
+              <li>
                 <Link href="/privacypolicy" className="hover:text-yellow-500">
                   PrivacyPolicy
                 </Link>

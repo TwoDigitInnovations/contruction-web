@@ -11,19 +11,19 @@ import { TiThMenu } from "react-icons/ti";
 import { ImCross } from "react-icons/im";
 
 // Material-UI imports
-import { 
-  IconButton, 
-  Menu, 
-  MenuItem, 
-  Avatar, 
-  Divider, 
-  ListItemIcon, 
-  ListItemText 
+import {
+  IconButton,
+  Menu,
+  MenuItem,
+  Avatar,
+  Divider,
+  ListItemIcon,
+  ListItemText
 } from '@mui/material';
-import { 
-  AccountCircle, 
-  Person, 
-  ExitToApp, 
+import {
+  AccountCircle,
+  Person,
+  ExitToApp,
   History,
   ShoppingBag
 } from '@mui/icons-material';
@@ -39,48 +39,48 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
   const [showHover, setShowHover] = useState(true);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Sidebar drawer state
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // const [profileExpanded, setProfileExpanded] = useState(false);
   // const [sidebarOpen, setSidebarOpen] = useState(false);
-const [profileExpanded, setProfileExpanded] = useState(false);
-  
+  const [profileExpanded, setProfileExpanded] = useState(false);
 
-  
+
+
   // Material-UI Menu state
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-   const toggleNavbar = () => {
+  const toggleNavbar = () => {
     setIsOpen(!isOpen);
   };
 
- const sidebarClass = `sidebar ${isOpen ? 'open' : 'closed'}`;
+  const sidebarClass = `sidebar ${isOpen ? 'open' : 'closed'}`;
   console.log("navberuser==>", user);
-  
-// useEffect(() => {
-//   setSidebarOpen(false);
-// }, []);
 
-useEffect(() => {
-  router.events.on("routeChangeComplete", () => {
+  // useEffect(() => {
+  //   setSidebarOpen(false);
+  // }, []);
+
+  useEffect(() => {
+    router.events.on("routeChangeComplete", () => {
+      loader(false);
+      // setNavbarOpen(false); // Add this line to close sidebar on route change
+    });
+    router.events.on("routeChangeStart", () => {
+      loader(true);
+    });
     loader(false);
-    // setNavbarOpen(false); // Add this line to close sidebar on route change
-  });
-  router.events.on("routeChangeStart", () => {
-    loader(true);
-  });
-  loader(false);
-}, []);
+  }, []);
 
 
   const logout = async () => {
     setIsLoading(true);
-    
+
     // 3 second loading
     await new Promise(resolve => setTimeout(resolve, 3000));
-    
+
     router.push(`/`);
     localStorage.removeItem("userDetail");
     localStorage.removeItem("token");
@@ -117,10 +117,10 @@ useEffect(() => {
     router.push("/Order/profile");
   };
 
-const handleMyOrdersClick = () => {
-  handleMenuClose();
-  router.push("/Order/myOrder");
-};
+  const handleMyOrdersClick = () => {
+    handleMenuClose();
+    router.push("/Order/myOrder");
+  };
 
   const handleHistoryClick = () => {
     handleMenuClose();
@@ -129,21 +129,21 @@ const handleMyOrdersClick = () => {
 
   // Sidebar handlers
   const toggleSidebar = (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  setSidebarOpen(!sidebarOpen);
-};
+    e.preventDefault();
+    e.stopPropagation();
+    setSidebarOpen(!sidebarOpen);
+  };
 
-const closeSidebar = (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  setSidebarOpen(false);
-};
+  const closeSidebar = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSidebarOpen(false);
+  };
 
- const handleSidebarNavigation = (href) => {
-  setIsOpen(false);
-  router.push(href);
-};
+  const handleSidebarNavigation = (href) => {
+    setIsOpen(false);
+    router.push(href);
+  };
 
   const toggleProfileExpansion = () => {
     setProfileExpanded(!profileExpanded);
@@ -191,180 +191,172 @@ const closeSidebar = (e) => {
 
   const handleItemClick = (index, href) => {
     setActiveIndex(index);
-    setMenuOpen(false);  
+    setMenuOpen(false);
     router.push(href);
   };
 
   return (
     <>
-      {/* Fixed navbar with higher z-index */}
-    {/* <nav className="fixed top-0 left-0 right-0 w-full" style={{ width: '100vw', zIndex: 9999 }}> */}
- <nav 
-  className="fixed top-0 left-0 right-0 w-full bg-custom-black" 
-  style={{ 
-    width: '100vw', 
-    position: 'fixed !important',
-    top: '0 !important',
-    zIndex: 99999
-  }}
->
-        <div className="bg-custom-black py-4 px-6 md:px-12 flex justify-between items-center relative" style={{ width: '100%', boxSizing: 'border-box' }}>
+
+      <nav
+        className="w-full bg-custom-black"
+
+      >
+        <div className="bg-custom-black max-w-7xl mx-auto py-4 px-6 md:px-0 flex justify-between items-center relative" style={{ width: '100%', boxSizing: 'border-box' }}>
           {/* Logo */}
-          <div onClick={()=>router.push("/")}>
+          <div onClick={() => router.push("/")}>
             <Image className="text-yellow-500  " src='/Image/logo.png' width={100} height={100} />
           </div>
 
           {/* Hamburger Menu for Sidebar */}
-         <div className="sm:hidden" onClick={toggleNavbar}>
-  <TiThMenu className="text-white text-2xl cursor-pointer pointer-events-auto" />
-</div>
+          <div className="sm:hidden" onClick={toggleNavbar}>
+            <TiThMenu className="text-white text-2xl cursor-pointer pointer-events-auto" />
+          </div>
 
           {/* Desktop Menu Items (hidden on mobile) */}
           <div className="hidden sm:flex sm:flex-row sm:pl-10 md:flex-row flex-col gap-2 md:gap-5 items-center">
             {menuItems.slice(0, 4).map((item, index) => (
               <div key={index}>
                 <div
-                 onClick={() => handleItemClick(index, item.href)}
-      className={`cursor-pointer text-lg font-sans ${
-        activeIndex === index
-          ? "text-yellow-500 border-b-2 border-yellow-500"
-          : "text-white hover:text-yellow-500"
-      }`}
-    >
+                  onClick={() => handleItemClick(index, item.href)}
+                  className={`cursor-pointer text-lg font-sans ${activeIndex === index
+                    ? "text-yellow-500 border-b-2 border-yellow-500"
+                    : "text-white hover:text-yellow-500"
+                    }`}
+                >
                   {item.title}
-                  
+
                 </div>
               </div>
             ))}
           </div>
 
           {/* Desktop Items */}
-       
-<div className="hidden md:flex gap-3 justify-center items-center flex-shrink-0">
-  {/* Language Selector */}
-  <div className="bg-custom-black flex justify-center items-center gap-2 flex-shrink-0">
-    <TiWorld className="text-2xl text-white" />
-    <select 
-  className="bg-transparent outline-none text-white cursor-pointer"
-  style={{ 
-    backgroundColor: 'transparent',
-    color: 'white'
-  }}
->
-  <option value="en" style={{ backgroundColor: '#000000', color: 'white' }}>English</option>
-  <option value="es" style={{ backgroundColor: '#000000', color: 'white' }}>Spanish</option>
-  <option value="de" style={{ backgroundColor: '#000000', color: 'white' }}>German</option>
-  <option value="gr" style={{ backgroundColor: '#000000', color: 'white' }}>Greek</option>
-  <option value="fr" style={{ backgroundColor: '#000000', color: 'white' }}>French</option>
-</select>
-  </div>
 
-  {/* Contact Us */}
- <button
-  onClick={() => router.push("/contact-us")}
-  className="px-4 bg-yellow-600 rounded-md flex-shrink-0"
-  style={{ paddingTop: '5px', paddingBottom: '5px' }}
->
-  Contact Us
-</button>
+          <div className="hidden md:flex gap-3 justify-center items-center flex-shrink-0">
+            {/* Language Selector */}
+            <div className="bg-custom-black flex justify-center items-center gap-2 flex-shrink-0">
+              <TiWorld className="text-2xl text-white" />
+              <select
+                className="bg-transparent outline-none text-white cursor-pointer"
+                style={{
+                  backgroundColor: 'transparent',
+                  color: 'white'
+                }}
+              >
+                <option value="en" style={{ backgroundColor: '#000000', color: 'white' }}>English</option>
+                <option value="es" style={{ backgroundColor: '#000000', color: 'white' }}>Spanish</option>
+                <option value="de" style={{ backgroundColor: '#000000', color: 'white' }}>German</option>
+                <option value="gr" style={{ backgroundColor: '#000000', color: 'white' }}>Greek</option>
+                <option value="fr" style={{ backgroundColor: '#000000', color: 'white' }}>French</option>
+              </select>
+            </div>
 
-  {/* Desktop User Menu */}
-  {user?.token ? (
-    <div className="flex-shrink-0">
-      <IconButton
-        onClick={handleMenuClick}
-        size="small"
-        sx={{ 
-          width: 40,
-          height: 40,
-          flexShrink: 0
-        }}
-        disableRipple={true}
-      >
-        <Avatar 
-          sx={{ width: 32, height: 32, bgcolor: '#d97706' }}
-        >
-          {user.username[0].toUpperCase()}
-        </Avatar>
-      </IconButton>
-      
-      <Menu
-  anchorEl={anchorEl}
-  id="account-menu"
-  open={open}
-  onClose={handleMenuClose}
-  onClick={handleMenuClose}
-  disableScrollLock={true}
-  disablePortal={false}
-  style={{ zIndex: 9999 }}
-  PaperProps={{
-    sx: {
-      width: '140px',
-      mt: 1
-    }
-  }}
-  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
->
-        <MenuItem onClick={handleProfileClick} dense>
-          <ListItemIcon><Person fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Profile" />
-        </MenuItem>
-         <MenuItem onClick={handleMyOrdersClick} dense>
-    <ListItemIcon><ShoppingBag fontSize="small" /></ListItemIcon>
-    <ListItemText primary="My Orders" />
-  </MenuItem>
-        <MenuItem onClick={handleHistoryClick} dense>
-          <ListItemIcon><History fontSize="small" /></ListItemIcon>
-          <ListItemText primary="History" />
-        </MenuItem>
-        <MenuItem onClick={handleLogoutClick} dense>
-          <ListItemIcon><ExitToApp fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Logout" />
-        </MenuItem>
-      </Menu>
-    </div>
-  ) : (
-    <IconButton
-      onClick={() => router.push("/auth/signIn")}
-      size="large"
-      className="flex-shrink-0"
-    >
-      <FaUserCircle className="text-yellow-600 text-3xl cursor-pointer" />
-    </IconButton>
-  )}
-</div>
+            {/* Contact Us */}
+            <button
+              onClick={() => router.push("/contact-us")}
+              className="px-4 bg-yellow-600 rounded-md flex-shrink-0"
+              style={{ paddingTop: '5px', paddingBottom: '5px' }}
+            >
+              Contact Us
+            </button>
+
+            {/* Desktop User Menu */}
+            {user?.token ? (
+              <div className="flex-shrink-0">
+                <IconButton
+                  onClick={handleMenuClick}
+                  size="small"
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    flexShrink: 0
+                  }}
+                  disableRipple={true}
+                >
+                  <Avatar
+                    sx={{ width: 32, height: 32, bgcolor: '#d97706' }}
+                  >
+                    {user.username[0].toUpperCase()}
+                  </Avatar>
+                </IconButton>
+
+                <Menu
+                  anchorEl={anchorEl}
+                  id="account-menu"
+                  open={open}
+                  onClose={handleMenuClose}
+                  onClick={handleMenuClose}
+                  disableScrollLock={true}
+                  disablePortal={false}
+                  style={{ zIndex: 9999 }}
+                  PaperProps={{
+                    sx: {
+                      width: '140px',
+                      mt: 1
+                    }
+                  }}
+                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                >
+                  <MenuItem onClick={handleProfileClick} dense>
+                    <ListItemIcon><Person fontSize="small" /></ListItemIcon>
+                    <ListItemText primary="Profile" />
+                  </MenuItem>
+                  <MenuItem onClick={handleMyOrdersClick} dense>
+                    <ListItemIcon><ShoppingBag fontSize="small" /></ListItemIcon>
+                    <ListItemText primary="My Orders" />
+                  </MenuItem>
+                  <MenuItem onClick={handleHistoryClick} dense>
+                    <ListItemIcon><History fontSize="small" /></ListItemIcon>
+                    <ListItemText primary="History" />
+                  </MenuItem>
+                  <MenuItem onClick={handleLogoutClick} dense>
+                    <ListItemIcon><ExitToApp fontSize="small" /></ListItemIcon>
+                    <ListItemText primary="Logout" />
+                  </MenuItem>
+                </Menu>
+              </div>
+            ) : (
+              <IconButton
+                onClick={() => router.push("/auth/signIn")}
+                size="large"
+                className="flex-shrink-0"
+              >
+                <FaUserCircle className="text-yellow-600 text-3xl cursor-pointer" />
+              </IconButton>
+            )}
+          </div>
         </div>
       </nav>
 
       {/* Sidebar Overlay */}
       {isOpen && (
-  <div 
-    className="fixed inset-0 bg-black bg-opacity-50 z-[9998] sm:hidden pointer-events-auto"
-    onClick={(e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setIsOpen(false);
-    }}
-  />
-)}
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-[9998] sm:hidden pointer-events-auto"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsOpen(false);
+          }}
+        />
+      )}
       {/* Left Sidebar Drawer */}
-    <div className={`fixed top-0 left-0 h-full w-80 bg-custom-black transform ${
-  isOpen ? 'translate-x-0' : '-translate-x-full'
-} transition-transform duration-300 ease-in-out z-[9999] sm:hidden pointer-events-auto`}>
-        
+      <div className={`fixed top-0 left-0 h-full w-80 bg-custom-black transform ${isOpen ? 'translate-x-0' : '-translate-x-full'
+        } transition-transform duration-300 ease-in-out z-[9999] sm:hidden pointer-events-auto`}>
+
         {/* Sidebar Header */}
         <div className="flex items-center justify-between p-4 bg-custom-black">
           <div className="flex items-center gap-3">
             <span className="text-yellow-500 font-bold text-2xl">Construction</span>
           </div>
-    <button 
-  onClick={() => setIsOpen(false)} 
-  className="text-white pointer-events-auto"
-  type="button"
->
-  <ImCross className="text-xl" />
-</button>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="text-white pointer-events-auto"
+            type="button"
+          >
+            <ImCross className="text-xl" />
+          </button>
         </div>
 
         {/* Sidebar Content */}
@@ -403,7 +395,7 @@ const closeSidebar = (e) => {
                 onClick={toggleProfileExpansion}
                 className="w-full flex items-center gap-3 p-3 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors duration-200"
               >
-                <Avatar 
+                <Avatar
                   sx={{ width: 32, height: 32, bgcolor: '#d97706' }}
                 >
                   {user.username[0].toUpperCase()}
@@ -460,28 +452,28 @@ const closeSidebar = (e) => {
       </div>
 
       {/* Logout Confirmation Popup */}
-     {showLogoutConfirm && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
-    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm">
-      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800">Confirm Logout</h3>
-      <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Are you sure you want to logout?</p>
-      <div className="flex gap-2 sm:gap-3 justify-end">
-        <button
-          onClick={handleLogoutCancel}
-          className="px-3 py-2 text-sm sm:text-base bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleLogoutConfirm}
-          className="px-3 py-2 text-sm sm:text-base bg-yellow-500 text-white rounded hover:bg-yellow-700"
-        >
-          Logout
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800">Confirm Logout</h3>
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Are you sure you want to logout?</p>
+            <div className="flex gap-2 sm:gap-3 justify-end">
+              <button
+                onClick={handleLogoutCancel}
+                className="px-3 py-2 text-sm sm:text-base bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogoutConfirm}
+                className="px-3 py-2 text-sm sm:text-base bg-yellow-500 text-white rounded hover:bg-yellow-700"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Loading Spinner */}
       {isLoading && (

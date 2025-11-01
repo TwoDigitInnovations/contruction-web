@@ -120,8 +120,8 @@ function History(props) {
   const filteredData = historyData.filter(order => {
     const matchesFilter = filterStatus === "all" || order.status === filterStatus;
     const matchesSearch = order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.customerName.toLowerCase().includes(searchTerm.toLowerCase());
+      order.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customerName.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -130,7 +130,7 @@ function History(props) {
     return (
       <div>
         {/* Hero Section */}
-        <div className="relative bg-gray-800 bg-cover bg-center h-screen w-full">
+        <div className="relative bg-[url('/Image/construction.jpg')] bg-cover bg-center h-[50vh] sm:h-[60vh] md:h-screen w-full">
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
           <div className="absolute inset-0 flex flex-col justify-center items-center z-10">
             <p className="text-center sf-heading text-4xl md:text-5xl lg:text-6xl text-white">

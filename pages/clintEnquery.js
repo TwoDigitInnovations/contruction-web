@@ -102,9 +102,9 @@ function ClintEnquery(props) {
   };
 
   return (
-    <div>
+    <div className="max-w-7xl mx-auto">
       <div>
-        <div className="bg-custom-black pb-10 pt-10">
+        <div className="bg-custom-black py-12">
           <div className="">
             <p className="text-4xl sf-heading text-center md:p-5 py-3 px-3 pt-10">
               Leading Way In Building & Civil Construction
@@ -142,8 +142,8 @@ function ClintEnquery(props) {
           {/* left form code start form here */}
           <div className="">
             <form onSubmit={handleSubmit}>
-              <div className="flex gap-5 justify-center flex-col md:mx-12 mx-5 md:flex-row">
-                <div className="bg-yellow-600 md:w-[60%] w-full py-5 rounded mt-10">
+              <div className="flex gap-5 justify-center flex-col  md:flex-row grid md:grid-cols-3 px-4 md:px-0">
+                <div className="bg-yellow-600 md:col-span-2 w-full py-5 rounded mt-10">
                   <p className="px-10 sf-heading text-white pb-5">Request a Quote</p>
                   <p className="px-10 pb-5 text-white text-sm">
                     Complete control over products allow us to our customers the
@@ -209,8 +209,8 @@ function ClintEnquery(props) {
                   </div>
                 </div>
 
-                {/* right contact info code  */}
-                <div className="bg-yellow-600 mt-10 md:w-[30%] w-full rounded">
+                
+                <div className="bg-yellow-600 mt-10 w-full rounded">
                   <div>
                     <p className="px-8 text-white sf-heading py-5">Contact Info</p>
                     <div className="px-8">

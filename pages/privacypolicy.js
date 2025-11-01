@@ -5,7 +5,7 @@ export default function PrivacyPolicy() {
   return (
     <>
       {/* Hero Section */}
-      <div className="relative bg-[url('/Image/construction.jpg')] bg-cover bg-center h-96 w-full">
+      <div className="relative bg-[url('/Image/construction.jpg')] bg-cover bg-center h-[50vh] sm:h-[60vh] md:h-screen w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent">
           <div className="relative z-10 flex flex-col px-5 md:px-20 justify-center items-start h-full text-white">
             <p className="text-4xl md:text-5xl pb-2 font-semibold">Privacy Policy</p>

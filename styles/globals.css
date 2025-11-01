@@ -1,6 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@theme {
+  --font-poppins: "Poppins", sans-serif;
+}
 
 :root {
   --background: #ffffff;
@@ -14,7 +20,6 @@
   }
 }
 
-
 .navbar-fixed {
   position: fixed !important;
   top: 0 !important;
@@ -24,41 +29,44 @@
   width: 100vw !important;
 }
 
-
 @font-face {
-  font-family: 'Arimo';
-  src: url('/fonts/Arimo-Regular.ttf') format('truetype');
+  font-family: "Arimo";
+  src: url("/fonts/Arimo-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
-
 @font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/SFPRODISPLAYMEDIUM.ttf') format('truetype');
+  font-family: "SF Pro Display";
+  src: url("/fonts/SFPRODISPLAYMEDIUM.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/SFPRODISPLAYBOLD.ttf') format('truetype');
+  font-family: "SF Pro Display";
+  src: url("/fonts/SFPRODISPLAYBOLD.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
 }
 
-.sf-heading {
-  font-family: 'SF Pro Display', sans-serif;
+/* .sf-heading {
+  font-family: "SF Pro Display", sans-serif;
   font-weight: 700;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'SF Pro Display', sans-serif;
-  font-weight: 700; 
-}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "SF Pro Display", sans-serif;
+  font-weight: 700;
+} */
 
 body {
   color: var(--foreground);
   background: var(--background);
-   font-family: 'Arimo', sans-serif;
+  font-family: var(--font-poppins);
 }

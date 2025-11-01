@@ -12,12 +12,12 @@ import Image from "next/image";
 export default function Home(props) {
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [projects, setProjects] = useState([]);
-const [currentPage, setCurrentPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
-const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
 
 
-const router = useRouter();
+  const router = useRouter();
 
 
   const toggleFilter = () => {
@@ -27,44 +27,44 @@ const router = useRouter();
     setIsFilterVisible(false);
   };
 
-const getProjectData = async (page = 1) => {
-  setLoading(true);
-  try {
-    // Minimum 500ms loading time for smooth UX
-    const [response] = await Promise.all([
-      Api("get", `getProject?page=${page}&limit=3`, "", router),
-      new Promise(resolve => setTimeout(resolve, 500))
-    ]);
-    
-    console.log("res================> get project :", response);
-    setProjects(response?.data?.data || []);
-    setCurrentPage(response?.data?.page || 1);
-    setTotalPages(response?.data?.totalPages || 1);
-    setLoading(false);
-  } catch (error) {
-    setLoading(false);
-    console.log(error);
-    // props.toaster({ type: "error", message: error?.data?.message });
-  }
-};
+  const getProjectData = async (page = 1) => {
+    setLoading(true);
+    try {
+      // Minimum 500ms loading time for smooth UX
+      const [response] = await Promise.all([
+        Api("get", `getProject?page=${page}&limit=3`, "", router),
+        new Promise(resolve => setTimeout(resolve, 500))
+      ]);
 
-useEffect(() => {
-  getProjectData(1);
-}, []);
+      console.log("res================> get project :", response);
+      setProjects(response?.data?.data || []);
+      setCurrentPage(response?.data?.page || 1);
+      setTotalPages(response?.data?.totalPages || 1);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+      // props.toaster({ type: "error", message: error?.data?.message });
+    }
+  };
 
-const projectImages = [
-  "/Image/img.png",
-  "/Image/img1.png", 
-  "/Image/img3.png"
-];
+  useEffect(() => {
+    getProjectData(1);
+  }, []);
+
+  const projectImages = [
+    "/Image/img.png",
+    "/Image/img1.png",
+    "/Image/img3.png"
+  ];
 
   return (
     <>
       {/* Add top padding to account for fixed navbar */}
-     <div 
-  className="relative bg-[url('/Image/construction.jpg')] bg-cover bg-center h-screen w-full pt-20" 
-  style={{ zIndex: 1 }}
->
+      <div
+        className="relative bg-[url('/Image/construction.jpg')] bg-cover bg-center h-screen w-full pt-20"
+        style={{ zIndex: 1 }}
+      >
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent">
           <div className="relative z-10 flex flex-col px-5 md:px-20 justify-start items-start h-full top-48 text-white">
             <p className="text-4xl pb-2 font-semibold mx-6 md:mx-0">We Prepare</p>
@@ -112,29 +112,29 @@ const projectImages = [
       {/* Main Content Section */}
       <div className="bg-custom-black">
         <div className="hidden md:block">
-        <div className="flex flex-col sm:flex-row px-5 md:px-20 gap-5 md:gap-28 pt-20 md:pt-8">
-          <div className="flex justify-center gap-2">
-            <p className="pt-2 text-yellow-500 font-semibold text-3xl">25+</p>
-            <div>
-              <p>Years of</p>
-              <span> Experience</span>
+          <div className="flex flex-col sm:flex-row px-5 md:px-20 gap-5 md:gap-28 pt-20 md:pt-8">
+            <div className="flex justify-center gap-2">
+              <p className="pt-2 text-yellow-500 font-semibold text-3xl">25+</p>
+              <div>
+                <p>Years of</p>
+                <span> Experience</span>
+              </div>
+            </div>
+            <div className="flex justify-center gap-2">
+              <p className="pt-2 text-yellow-500 font-semibold text-3xl">378+</p>
+              <div>
+                <p>Project</p>
+                <span> complete</span>
+              </div>
+            </div>
+            <div className="flex justify-center gap-2">
+              <p className="pt-2 text-yellow-500 font-semibold text-3xl">69+</p>
+              <div>
+                <p>Winning</p>
+                <span> global awards</span>
+              </div>
             </div>
           </div>
-          <div className="flex justify-center gap-2">
-            <p className="pt-2 text-yellow-500 font-semibold text-3xl">378+</p>
-            <div>
-              <p>Project</p>
-              <span> complete</span>
-            </div>
-          </div>
-          <div className="flex justify-center gap-2">
-            <p className="pt-2 text-yellow-500 font-semibold text-3xl">69+</p>
-            <div>
-              <p>Winning</p>
-              <span> global awards</span>
-            </div>
-          </div>
-        </div>
         </div>
 
         {/* Left Image and Right Text Section */}
@@ -174,34 +174,34 @@ const projectImages = [
       {/* Process Section */}
       <div className="bg-yellow-600">
         <div className="hidden md:block">
-        <div className="h-full flex justify-between items-center px-5 md:px-28 py-5">
-          <div className="text-center mb-4 sm:mb-0">
-            <p>Evaluation And Signing</p>
-            <p className="text-center text-sm">of The Contract</p>
-            <p className="text-center text-xs">step 1</p>
+          <div className="h-full flex justify-between items-center px-5 md:px-28 py-5">
+            <div className="text-center mb-4 sm:mb-0">
+              <p>Evaluation And Signing</p>
+              <p className="text-center text-sm">of The Contract</p>
+              <p className="text-center text-xs">step 1</p>
+            </div>
+            <div className="text-center mb-4 text-white sm:mb-0">
+              <p>Preparation Of The</p>
+              <p className="text-center text-sm">Work Plan</p>
+              <p className="text-center text-xs">step 2</p>
+            </div>
+            <div className="text-center mb-4 sm:mb-0">
+              <p>Implementation Of</p>
+              <p className="text-center text-sm">Quality Works</p>
+              <p className="text-center text-xs">step 3</p>
+            </div>
+            <div className="text-center">
+              <p>Delivering The Project</p>
+              <p className="text-center text-sm">To The Customer</p>
+              <p className="text-center text-xs">step 4</p>
+            </div>
           </div>
-          <div className="text-center mb-4 text-white sm:mb-0">
-            <p>Preparation Of The</p>
-            <p className="text-center text-sm">Work Plan</p>
-            <p className="text-center text-xs">step 2</p>
-          </div>
-          <div className="text-center mb-4 sm:mb-0">
-            <p>Implementation Of</p>
-            <p className="text-center text-sm">Quality Works</p>
-            <p className="text-center text-xs">step 3</p>
-          </div>
-          <div className="text-center">
-            <p>Delivering The Project</p>
-            <p className="text-center text-sm">To The Customer</p>
-            <p className="text-center text-xs">step 4</p>
-          </div>
+          {/* <hr className="w-[90%] mx-auto py-2" /> */}
+          <Image src="/Image/g1.png" width={1380}
+            height={100} />
         </div>
-        {/* <hr className="w-[90%] mx-auto py-2" /> */}
-        <Image  src="/Image/g1.png"  width={1380}
-        height={100} />
-         </div>
 
-    
+
         <div className="flex justify-between px-5 md:px-16 pt-5">
           <p className="text-3xl sf-heading text-custom-black font-semibold">
             Featured Project
@@ -275,87 +275,95 @@ const projectImages = [
       </div>
 
       <div>
-<div 
-  className="px-5 md:px-16 bg-yellow-600 py-12 relative" 
-  style={{ zIndex: 1 }}
->
-  {/* Simple Loader Overlay */}
-  {loading && (
-    <div className="absolute inset-0 bg-yellow-600 flex justify-center items-center z-[5]">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-    </div>
-  )}
+        <div
+          className="px-5 md:px-16 bg-yellow-600 py-12 relative"
+          style={{ zIndex: 1 }}
+        >
+          {/* Simple Loader Overlay */}
+          {loading && (
+            <div className="absolute inset-0 bg-yellow-600 flex justify-center items-center z-[5]">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+            </div>
+          )}
 
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-   {projects.slice(0, 3).map((project, index) => (
-  <div key={project._id || index}>
-    <div className="w-full h-64 overflow-hidden">
-      <img
-        className="w-full h-full object-cover"
-        src={project.image}
-        alt={project.title || `Project ${index + 1}`}
-      />
-    </div>
-    <div className="mt-2">
-      <h3 className="text-lg font-semibold text-black">
-        {project.name || `Project ${index + 1}`}
-      </h3>
-      <p className="text-sm text-gray-800 mt-1">
-        {project.projectname?.substring(0, 80) || "Project description"}...
-      </p>
-    </div>
-  </div>
-))}
-  </div>
-  
-  {/* Pagination with Numbers and Arrows */}
-  <div className="flex justify-center items-center gap-4 mt-6">
-    {/* Previous Arrow */}
-    <div
-      onClick={() => currentPage > 1 && getProjectData(currentPage - 1)}
-      className={`cursor-pointer ${currentPage <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:text-black'}`}
-    >
-      <FaAngleLeft size={20} />
-    </div>
-    
-    {/* Page Numbers */}
-    <div className="flex gap-2">
-      {Array.from({ length: totalPages }, (_, index) => {
-        const pageNumber = index + 1;
-        return (
-          <button
-            key={pageNumber}
-            onClick={() => getProjectData(pageNumber)}
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-              currentPage === pageNumber
-                ? 'bg-black text-yellow-600'
-                : 'bg-white text-black hover:bg-gray-200'
-            }`}
-          >
-            {pageNumber}
-          </button>
-        );
-      })}
-    </div>
-    
-    {/* Next Arrow */}
-    <div
-      onClick={() => currentPage < totalPages && getProjectData(currentPage + 1)}
-      className={`cursor-pointer ${currentPage >= totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:text-black'}`}
-    >
-      <FaAngleRight size={20} />
-    </div>
-  </div>
-  
-  <div className="flex justify-end pt-4 px-5 text-custom-black font-semibold gap-2 items-center">
-    <Link href="/project">
-      <p className="cursor-pointer text-white hover:text-yellow-500 transition-all">Explore all projects</p>
-    </Link>
-    <Link href="/project">
-      <FaCircleArrowRight className="cursor-pointer" />
-    </Link>
-  </div>
-</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {projects.slice(0, 3).map((project, index) => (
+              <div key={project._id || index}>
+                <div className="w-full overflow-hidden">
+                   <img
+                      width="100%"
+                      height="100%"
+                      src={
+                        project.image && project.image.length > 0
+                          ? project.image[0] // First image from array
+                          : "/Image/constructionProject.png" // Fallback to default image
+                      }
+                      alt="construction project"
+                      className="w-full md:h-[450px] h-[400px] object-cover rounded-lg"
+                      onError={(e) => {
+                        e.target.src = "/Image/constructionProject.png"; // Fallback if image fails to load
+                      }}
+                    />
+                </div>
+                <div className="mt-2">
+                  <h3 className="text-lg font-semibold text-black">
+                    {project.name || `Project ${index + 1}`}
+                  </h3>
+                  <p className="text-sm text-gray-800 mt-1">
+                    {project.projectname?.substring(0, 80) || "Project description"}...
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Pagination with Numbers and Arrows */}
+          <div className="flex justify-center items-center gap-4 mt-6">
+            {/* Previous Arrow */}
+            <div
+              onClick={() => currentPage > 1 && getProjectData(currentPage - 1)}
+              className={`cursor-pointer ${currentPage <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:text-black'}`}
+            >
+              <FaAngleLeft size={20} />
+            </div>
+
+            {/* Page Numbers */}
+            <div className="flex gap-2">
+              {Array.from({ length: totalPages }, (_, index) => {
+                const pageNumber = index + 1;
+                return (
+                  <button
+                    key={pageNumber}
+                    onClick={() => getProjectData(pageNumber)}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${currentPage === pageNumber
+                        ? 'bg-black text-yellow-600'
+                        : 'bg-white text-black hover:bg-gray-200'
+                      }`}
+                  >
+                    {pageNumber}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Next Arrow */}
+            <div
+              onClick={() => currentPage < totalPages && getProjectData(currentPage + 1)}
+              className={`cursor-pointer ${currentPage >= totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:text-black'}`}
+            >
+              <FaAngleRight size={20} />
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-4 px-5 text-custom-black font-semibold gap-2 items-center">
+            <Link href="/project">
+              <p className="cursor-pointer text-white hover:text-yellow-500 transition-all">Explore all projects</p>
+            </Link>
+            <Link href="/project">
+              <FaCircleArrowRight className="cursor-pointer" />
+            </Link>
+          </div>
+        </div>
       </div>
 
       <div className="bg-custom-black pb-10">
@@ -375,15 +383,15 @@ const projectImages = [
 
         <div>
           <div className="flex justify-center items-center gap-3 my-5">
-          <div className="flex justify-center items-center gap-2 cursor-pointer"><span><FaAngleLeft /></span><button className="text-sm">Prev</button></div>
-            <img src="/Image/profile1.png" className="w-10 h-10 border opacity-35 rounded-full"/>
-            <img src="/Image/profile.png" className="w-14 h-14 border-4 border-yellow-600 rounded-full"/>
-            <img src="/Image/profile3.png" className="w-10 h-10 border opacity-35 rounded-full"/>
-             <div className="flex justify-center items-center gap-2 cursor-pointer"><button className="text-sm">Next</button> <span><FaAngleRight /></span></div>
+            <div className="flex justify-center items-center gap-2 cursor-pointer"><span><FaAngleLeft /></span><button className="text-sm">Prev</button></div>
+            <img src="/Image/profile1.png" className="w-10 h-10 border opacity-35 rounded-full" />
+            <img src="/Image/profile.png" className="w-14 h-14 border-4 border-yellow-600 rounded-full" />
+            <img src="/Image/profile3.png" className="w-10 h-10 border opacity-35 rounded-full" />
+            <div className="flex justify-center items-center gap-2 cursor-pointer"><button className="text-sm">Next</button> <span><FaAngleRight /></span></div>
           </div>
         </div>
 
-       <ClintEnquery/>
+        <ClintEnquery />
         {/* left form code start form here */}
       </div>
     </>

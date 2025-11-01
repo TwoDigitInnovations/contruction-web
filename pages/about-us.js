@@ -8,7 +8,7 @@ function AboutUs() {
   return (
     <div className="">
       {/* Header Section */}
-      <div className="relative bg-[url('/Image/construction.jpg')] bg-cover bg-center h-screen w-full">
+      <div className="relative bg-[url('/Image/construction.jpg')] bg-cover bg-center h-[50vh] sm:h-[60vh] md:h-screen w-full">
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
         <div className="absolute inset-0 flex flex-col justify-center items-center z-10">
           <p className="text-center sf-heading font-semibold text-4xl md:text-5xl lg:text-6xl text-white">
