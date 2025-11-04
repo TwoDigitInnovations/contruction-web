@@ -255,8 +255,8 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
             {/* Contact Us */}
             <button
               onClick={() => router.push("/contact-us")}
-              className="px-4 bg-yellow-600 rounded-md flex-shrink-0"
-              style={{ paddingTop: '5px', paddingBottom: '5px' }}
+              className="px-4 bg-yellow-600 rounded-md flex-shrink-0 py-2.5"
+            
             >
               Contact Us
             </button>
@@ -275,7 +275,7 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
                   disableRipple={true}
                 >
                   <Avatar
-                    sx={{ width: 32, height: 32, bgcolor: '#d97706' }}
+                    sx={{ width: 36, height: 36, bgcolor: '#d97706' }}
                   >
                     {user.username[0].toUpperCase()}
                   </Avatar>
@@ -292,7 +292,7 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
                   style={{ zIndex: 9999 }}
                   PaperProps={{
                     sx: {
-                      width: '140px',
+                      width: '160px',
                       mt: 1
                     }
                   }}
@@ -300,19 +300,19 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
                   anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
                   <MenuItem onClick={handleProfileClick} dense>
-                    <ListItemIcon><Person fontSize="small" /></ListItemIcon>
+                    <ListItemIcon><Person fontSize="small" className="text-black" /></ListItemIcon>
                     <ListItemText primary="Profile" />
                   </MenuItem>
                   <MenuItem onClick={handleMyOrdersClick} dense>
-                    <ListItemIcon><ShoppingBag fontSize="small" /></ListItemIcon>
+                    <ListItemIcon><ShoppingBag fontSize="small" className="text-black" /></ListItemIcon>
                     <ListItemText primary="My Orders" />
                   </MenuItem>
                   <MenuItem onClick={handleHistoryClick} dense>
-                    <ListItemIcon><History fontSize="small" /></ListItemIcon>
+                    <ListItemIcon><History fontSize="small" className="text-black"/></ListItemIcon>
                     <ListItemText primary="History" />
                   </MenuItem>
                   <MenuItem onClick={handleLogoutClick} dense>
-                    <ListItemIcon><ExitToApp fontSize="small" /></ListItemIcon>
+                    <ListItemIcon><ExitToApp fontSize="small" className="text-black"/></ListItemIcon>
                     <ListItemText primary="Logout" />
                   </MenuItem>
                 </Menu>
@@ -343,7 +343,7 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
       )}
       {/* Left Sidebar Drawer */}
       <div className={`fixed top-0 left-0 h-full w-80 bg-custom-black transform ${isOpen ? 'translate-x-0' : '-translate-x-full'
-        } transition-transform duration-300 ease-in-out z-[9999] sm:hidden pointer-events-auto`}>
+        } transition-transform duration-300 ease-in-out z-[50] sm:hidden pointer-events-auto`}>
 
         {/* Sidebar Header */}
         <div className="flex items-center justify-between p-4 bg-custom-black">
