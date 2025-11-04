@@ -7,37 +7,64 @@ import ProductDetail from "@/Components/iteminfodetails";
 
 const libraries = ["places"];
 
-function OrderConcrete(props) {
+export default function OrderConcrete(props) {
   const router = useRouter();
   const categoryId = router?.query?.category;
   const { location, fetchCurrentLocation } = useLocation();
-  const [currentLocation, setCurrentLocation] = useState({ lat: "", lng: "" });
+  const [productdetail, setProductDetail] = useState({});
+  const [currentLocation, setCurrentLocation] = useState(null);
   const [shopsData, setShopsData] = useState([]);
   const [selectedShop, setSelectedShop] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
   const [open, setOpen] = useState(false);
   const mapRef = useRef(null);
-
+  const [selectedAttribute, setSelectedAttribute] = useState(null);
 
   const onMapLoad = useCallback((map) => {
     mapRef.current = map;
+    setMapReady(true);
   }, []);
-
 
   useEffect(() => {
-    (async () => {
-      let loc = location;
-      if (!loc) loc = await fetchCurrentLocation();
-
-      if (loc?.lat && loc?.lng) {
-        await new Promise(r => setTimeout(r, 500));
-        setCurrentLocation({ lat: loc.lat, lng: loc.lng });
-        getNearbyShops(loc);
+    const timer = setTimeout(async () => {
+      if (location?.lat && location?.lng) {
+        setCurrentLocation({ lat: location.lat, lng: location.lng });
+        getNearbyShops(location);
+      } else {
+        props.toaster({ type: "error", message: "Unable to get location." });
       }
+    }, 2000); // ⏱️ 2 second delay
 
-    })();
-  }, []);
+    return () => clearTimeout(timer); // cleanup on unmount
+  }, [location]);
 
+
+
+  const getProduct = async () => {
+    const data = {
+      category: categoryId,
+      posted_by: selectedShop?._id,
+    };
+    props.loader(true);
+
+    try {
+      const res = await Api("post", "getProductByVendorandCategory", data, router);
+      props.loader(false);
+
+      if (res.status && Array.isArray(res.data) && res.data.length > 0) {
+        setProductDetail(res.data[0]);
+        const firstWithValue = res.data[0]?.attributes?.find(
+          (it) => it?.value
+        );
+        if (firstWithValue) setSelectedAttribute(firstWithValue);
+      } else {
+        props.toaster({ type: "error", message: "No product found" });
+      }
+    } catch (err) {
+      props.loader(false);
+      props.toaster({ type: "error", message: "Failed to fetch product" });
+    }
+  };
 
   const getNearbyShops = async (loc) => {
     try {
@@ -48,9 +75,8 @@ function OrderConcrete(props) {
       });
       props.loader(false);
 
-      if (res?.status && res?.data?.length > 0) {
+      if (res?.status) {
         setShopsData(res.data);
-        setIsLoaded(true);
       } else {
         props.toaster({
           type: "info",
@@ -69,24 +95,20 @@ function OrderConcrete(props) {
 
 
   useEffect(() => {
-    if (!mapRef.current || !window.google) return;
-    const bounds = new window.google.maps.LatLngBounds();
+    if (!mapReady || !mapRef.current || !shopsData.length || !currentLocation)
+      return;
 
+    const bounds = new window.google.maps.LatLngBounds();
     shopsData.forEach((shop) => {
       bounds.extend({
         lat: shop.location.coordinates[1],
         lng: shop.location.coordinates[0],
       });
     });
-    if (currentLocation.lat && currentLocation.lng)
-      bounds.extend(currentLocation);
+    bounds.extend(currentLocation);
 
-
-    if (bounds.isEmpty()) return;
     mapRef.current.fitBounds(bounds);
-
-  }, [shopsData, currentLocation]);
-
+  }, [shopsData, currentLocation, mapReady]);
 
   const handleNextClick = () => {
     if (!selectedShop)
@@ -95,8 +117,11 @@ function OrderConcrete(props) {
         message: "Please select a shop first.",
       });
     setOpen(true);
-  };
 
+    if (selectedShop?._id && categoryId) {
+      getProduct();
+    }
+  };
 
   const mapStyles = [
     { elementType: "geometry", stylers: [{ color: "#1d2c4d" }] },
@@ -104,11 +129,9 @@ function OrderConcrete(props) {
     { featureType: "water", elementType: "geometry", stylers: [{ color: "#0e1626" }] },
   ];
 
-  if (typeof window === "undefined") return null;
-
   return (
     <div>
-
+      {/* Header Banner */}
       <div className="relative bg-[url('/Image/construction.jpg')] bg-cover bg-center h-[50vh] md:h-screen">
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent"></div>
         <div className="absolute inset-0 flex justify-center items-center">
@@ -122,20 +145,15 @@ function OrderConcrete(props) {
             googleMapsApiKey={process.env.NEXT_PUBLIC_MAP_API_KEY}
             libraries={libraries}
           >
-            {isLoaded && (
+            {currentLocation ? (
               <GoogleMap
                 onLoad={onMapLoad}
-                onError={(e) => console.error("Map failed to load:", e)}
                 mapContainerStyle={{
                   width: "100%",
                   height: "600px",
                   borderRadius: "12px",
                 }}
-                center={
-                  currentLocation.lat
-                    ? currentLocation
-                    : { lat: 26.047822, lng: 82.086527 }
-                }
+                center={currentLocation}
                 zoom={12}
                 options={{
                   styles: mapStyles,
@@ -144,7 +162,6 @@ function OrderConcrete(props) {
                   fullscreenControl: true,
                 }}
               >
-
                 {shopsData.map((shop, i) => (
                   <Marker
                     key={i}
@@ -155,37 +172,39 @@ function OrderConcrete(props) {
                     onClick={() => setSelectedShop(shop)}
                     title={shop.shop_name}
                     icon={{
-                      url: "https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
-                      animation: window.google.maps.Animation.DROP,
-                      scaledSize: new window.google.maps.Size(40, 40),
+                      url:
+                        selectedShop?._id === shop._id
+                          ? "https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png"
+                          : "https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
+                      // scaledSize: new window.google.maps.Size(40, 40),
                     }}
-
                   />
                 ))}
 
-
-                {currentLocation.lat && (
-                  <Marker
-                    position={currentLocation}
-                    title="Current Location"
-                    icon={{
-                      url: "https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png",
-                    }}
-                  />
-                )}
+                {/* ✅ Current Location Marker */}
+                <Marker
+                  position={currentLocation}
+                  title="Your Location"
+                  icon={{
+                    url: "https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png",
+                    scaledSize: new window.google.maps.Size(40, 40),
+                  }}
+                />
               </GoogleMap>
+            ) : (
+              <div className="flex justify-center items-center h-[600px] text-gray-300">
+                Loading map & location...
+              </div>
             )}
           </LoadScript>
 
-
           {selectedShop && (
-            <div className="mt-4 p-4 bg-gray-600 rounded">
+            <div className="mt-4 p-4 bg-gray-700 rounded-md">
               <h3 className="text-white font-semibold">{selectedShop.shop_name}</h3>
               <p className="text-gray-300 text-sm">{selectedShop.address}</p>
             </div>
           )}
         </div>
-
 
         <div className="mt-10 text-center">
           <button
@@ -196,18 +215,15 @@ function OrderConcrete(props) {
           </button>
         </div>
 
-        {/* Product Detail Popup */}
         <ProductDetail
-          selectedShop={selectedShop}
-          categotyid={categoryId}
-          loader={props.loader}
-          toaster={props.toaster}
           open={open}
+          selectedShop={selectedShop}
           setOpen={setOpen}
+          setSelectedAttribute={setSelectedAttribute}
+          selectedAttribute={selectedAttribute}
+          productdetail={productdetail}
         />
       </div>
     </div>
   );
 }
-
-export default OrderConcrete;

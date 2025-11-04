@@ -12,20 +12,19 @@ export const LocationProvider = ({ children }) => {
 
   useEffect(() => {
     (async () => {
-     
+
       const profileFound = await fetchProfileData();
       if (profileFound) return;
-    
+
       const saved = localStorage.getItem("userLocation");
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed?.location?.lat && parsed?.location?.lng) {
           setLocation(parsed.location);
           setSource(parsed.source || "local");
-          return; 
+          return;
         }
       }
-
 
       await fetchCurrentLocation();
     })();
@@ -46,6 +45,7 @@ export const LocationProvider = ({ children }) => {
         const profileLoc = {
           lat: response.data.location.coordinates[1],
           lng: response.data.location.coordinates[0],
+          address: response.data.address,
         };
         setLocation(profileLoc);
         setSource("profile");
@@ -57,7 +57,6 @@ export const LocationProvider = ({ children }) => {
       return false;
     }
   };
-
 
   const fetchCurrentLocation = async () => {
     setLoading(true);
@@ -99,7 +98,7 @@ export const LocationProvider = ({ children }) => {
     }
   };
 
-  
+
   const setProfileLocation = (manualAddressObj) => {
     setLocation(manualAddressObj);
     setSource("profile");

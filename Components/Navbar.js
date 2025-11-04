@@ -56,13 +56,6 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
     setIsOpen(!isOpen);
   };
 
-  const sidebarClass = `sidebar ${isOpen ? 'open' : 'closed'}`;
-  console.log("navberuser==>", user);
-
-  // useEffect(() => {
-  //   setSidebarOpen(false);
-  // }, []);
-
   useEffect(() => {
     router.events.on("routeChangeComplete", () => {
       loader(false);
@@ -77,8 +70,6 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
 
   const logout = async () => {
     setIsLoading(true);
-
-    // 3 second loading
     await new Promise(resolve => setTimeout(resolve, 3000));
 
     router.push(`/`);
