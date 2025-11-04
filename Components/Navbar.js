@@ -256,7 +256,7 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
             <button
               onClick={() => router.push("/contact-us")}
               className="px-4 bg-yellow-600 rounded-md flex-shrink-0 py-2.5"
-            
+
             >
               Contact Us
             </button>
@@ -308,11 +308,11 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
                     <ListItemText primary="My Orders" />
                   </MenuItem>
                   <MenuItem onClick={handleHistoryClick} dense>
-                    <ListItemIcon><History fontSize="small" className="text-black"/></ListItemIcon>
+                    <ListItemIcon><History fontSize="small" className="text-black" /></ListItemIcon>
                     <ListItemText primary="History" />
                   </MenuItem>
                   <MenuItem onClick={handleLogoutClick} dense>
-                    <ListItemIcon><ExitToApp fontSize="small" className="text-black"/></ListItemIcon>
+                    <ListItemIcon><ExitToApp fontSize="small" className="text-black" /></ListItemIcon>
                     <ListItemText primary="Logout" />
                   </MenuItem>
                 </Menu>
@@ -341,11 +341,11 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
           }}
         />
       )}
-      {/* Left Sidebar Drawer */}
-      <div className={`fixed top-0 left-0 h-full w-80 bg-custom-black transform ${isOpen ? 'translate-x-0' : '-translate-x-full'
-        } transition-transform duration-300 ease-in-out z-[50] sm:hidden pointer-events-auto`}>
 
-        {/* Sidebar Header */}
+      {/* <div className={`fixed top-0 left-0 h-full w-80 bg-custom-black transform ${isOpen ? 'translate-x-0' : '-translate-x-full'
+        } transition-transform duration-300 ease-in-out z-50 sm:hidden pointer-events-auto`}>
+
+
         <div className="flex items-center justify-between p-4 bg-custom-black">
           <div className="flex items-center gap-3">
             <span className="text-yellow-500 font-bold text-2xl">Construction</span>
@@ -359,9 +359,9 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
           </button>
         </div>
 
-        {/* Sidebar Content */}
+
         <div className="p-4 overflow-y-auto h-full pb-20">
-          {/* Main Menu Items */}
+
           {menuItems.map((item, index) => (
             <div key={index} className="mb-2">
               <button
@@ -374,7 +374,7 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
             </div>
           ))}
 
-          {/* Language Selector */}
+
           <div className="mb-4 mt-6">
             <div className="flex items-center gap-3 p-3 text-white">
               <TiWorld className="text-xl" />
@@ -388,7 +388,8 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
             </div>
           </div>
 
-          {/* User Profile Section */}
+
+
           {user?.token ? (
             <div className="mt-6 border-t border-white border-opacity-20 pt-4">
               <button
@@ -408,7 +409,7 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
                 )}
               </button>
 
-              {/* Profile Submenu */}
+              
               {profileExpanded && (
                 <div className="ml-6 mt-2 space-y-1">
                   <button
@@ -449,7 +450,7 @@ const Navbar = ({ loader, toaster, isOpen, setIsOpen }) => {
             </div>
           )}
         </div>
-      </div>
+      </div> */}
 
       {/* Logout Confirmation Popup */}
       {showLogoutConfirm && (
