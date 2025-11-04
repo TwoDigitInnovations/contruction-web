@@ -26,7 +26,7 @@ function Project(props) {
   const [editingProjectId, setEditingProjectId] = useState(null);
   const [selectedImages, setSelectedImages] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
-
+  const [data, setData] = useState({})
   const [createProject, setCreateProject] = useState({
     name: "",
     projectname: "",
@@ -79,6 +79,7 @@ function Project(props) {
 
       getProjectData();
       getCategory();
+      getordercount();
     };
 
     checkAuth();
@@ -103,6 +104,21 @@ function Project(props) {
       props.toaster({ type: "error", message: err?.message });
     }
   };
+
+  const getordercount = async () => {
+    props.loader(true);
+    try {
+      const res = await Api("get", "getordercount", "", router);
+      props.loader(false);
+      setData(res.data)
+    } catch (err) {
+      props.loader(false);
+      console.log(err);
+      props.toaster({ type: "error", message: err?.message });
+    }
+  };
+
+
 
   const handleEdit = (project) => {
     setIsEditMode(true);
@@ -325,7 +341,7 @@ function Project(props) {
         <div className="flex flex-wrap justify-center items-center gap-6 mb-8">
           {projectData && projectData?.length && (
 
-            <div className="flex justify-center flex-wrap items-center gap-3 grid md:grid-cols-3 grid-cols-1">
+            <div className=" items-center gap-3 grid md:grid-cols-3 grid-cols-1">
               {projectData?.map((item, id) => (
                 <div key={id} className="w-full cursor-pointer md:px-0 relative">
                   {/* Edit and Delete icons */}
@@ -374,7 +390,7 @@ function Project(props) {
               <div className="w-full flex flex-col items-center">
                 <div
                   onClick={handleOpenForm}
-                  className="relative w-full md:h-[450px] h-[400px] rounded-2xl border-2 border-dashed border-gray-300 
+                  className="relative w-full md:h-[530px] h-[400px] rounded-2xl border-2 border-dashed border-gray-300 
                flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 
                hover:from-yellow-50 hover:to-yellow-100 transition-all duration-300 
                hover:shadow-lg cursor-pointer group"
@@ -549,7 +565,6 @@ function Project(props) {
         </div>
       )}
 
-
       {showDashBoard && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-400 bg-opacity-50 backdrop-blur overflow-y-auto px-4 py-6 md:py-10">
           <div className="bg-custom-black w-full md:w-[450px] px-8 py-4 rounded-lg mx-4 md:mx-0">
@@ -572,7 +587,7 @@ function Project(props) {
                 <p
                   className="w-full bg-white text-black px-14 py-4 border border-gray-300 rounded placeholder:text-custom-black"
                 >
-                  Total order 5
+                  Total order {data?.totalOrderCount || "0"}
                 </p>
               </div>
               <div className="mb-4 relative">
@@ -580,7 +595,7 @@ function Project(props) {
                 <p
                   className="w-full bg-white text-black px-14 py-4 border border-gray-300 rounded placeholder:text-custom-black"
                 >
-                  Order approved 11
+                  Order approved {data?.totalDeliveredOrder || "0"}
                 </p>
               </div>
               <div className="mb-4 relative">
@@ -588,7 +603,7 @@ function Project(props) {
                 <p
                   className="w-full bg-white text-black px-14 py-4 border border-gray-300 rounded placeholder:text-custom-black"
                 >
-                  Order pending 10
+                  Order pending {data?.totalPendingOrder || "0"}
                 </p>
               </div>
 
@@ -607,7 +622,6 @@ function Project(props) {
           </div>
         </div>
       )}
-
 
       {houshMaking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-400 bg-opacity-50 backdrop-blur overflow-y-auto px-4 py-6 md:py-10">

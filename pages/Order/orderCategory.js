@@ -20,8 +20,6 @@ function orderCategory() {
   const [distance, setDistance] = useState("");
   const [duration, setDuration] = useState("");
 
-
-  // Autocomplete refs
   const shopAutocompleteRef = useRef(null);
   const clientAutocompleteRef = useRef(null);
 
@@ -35,9 +33,6 @@ function orderCategory() {
   const onMapLoad = useCallback((map) => {
     setMapInstance(map);
   }, []);
-
-
-
 
 
   const calculateRoute = useCallback(async () => {
@@ -452,9 +447,6 @@ function orderCategory() {
                     title="Client Location"
                   />
                 )}
-
-
-
 
                 {directionsResponse && (
                   <DirectionsRenderer
