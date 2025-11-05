@@ -4,6 +4,7 @@ import { GoogleMap, LoadScript, Marker, DirectionsRenderer } from "@react-google
 import { useLocation } from "@/Components/context/LocationContext";
 import { Api } from "@/services/service";
 import { MdDateRange } from "react-icons/md";
+import Checkout from "@/Components/Checkout";
 
 const libraries = ["places"];
 
@@ -12,15 +13,32 @@ export default function OrderCategory(props) {
   const { location } = useLocation();
   const [shopLocation, setShopLocation] = useState(null);
   const [clientLocation, setClientLocation] = useState(null);
+  const [distanceValue, setDistanceValue] = useState(0);
   const [shopAddress, setShopAddress] = useState("");
+  const [attribute, setAttribute] = useState("")
   const [clientAddress, setClientAddress] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [description, setDescription] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedShop, setSelectedShop] = useState(null);
+  const [checkoutVisible, setCheckoutVisible] = useState(false)
+  const [orderStatus, setOrderStatus] = useState({
+    show: false,
+    success: false,
+    message: "",
+  });
 
-  console.log(location);
+  const [summary, setSummary] = useState({
+    total: 0,
+    taxRate: 0,
+    taxAmount: 0,
+    deliveryCharge: 0,
+    final: 0,
+    value: 0
+
+  });
+  const [setting, setSetting] = useState({});
 
   useEffect(() => {
     if (router.query.shopid) {
@@ -39,6 +57,66 @@ export default function OrderCategory(props) {
         .catch((err) => console.error("Shop fetch error:", err));
     }
   }, [router.query.shopid]);
+
+  useEffect(() => {
+    getSettings();
+  }, [])
+
+  const getSettings = async () => {
+    props.loader(true);
+    Api("get", "getSetting", "", router)
+      .then((res) => {
+        props.loader(false);
+        if (res?.data) {
+          setSetting({
+            TaxRate: res.data?.TaxRate || "",
+            RatePerKM: res.data?.RatePerKM || "",
+          });
+        }
+      })
+      .catch((err) => {
+        props.loader(false);
+        props.toaster({ type: "error", message: err?.message });
+      });
+  };
+
+  useEffect(() => {
+
+    const storedAttribute = localStorage.getItem("selectedAttribute");
+    const storedInput = localStorage.getItem("input");
+
+    if (storedAttribute && storedInput) {
+      const selectedAttribute = JSON.parse(storedAttribute);
+      const valueInput = parseFloat(storedInput);
+
+      setAttribute(selectedAttribute);
+
+      if (!setting || !distanceValue) return;
+
+      const taxRate = Number(setting?.TaxRate) || 0;
+      const ratePerKM = Number(setting?.RatePerKM) || 0;
+
+      if (selectedAttribute?.price) {
+        const distance = Number(distanceValue) || 0;
+        const total = valueInput * parseFloat(selectedAttribute.price);
+
+        const taxAmount = (total * taxRate) / 100;
+        const deliveryCharge = distance * ratePerKM;
+
+        const final = total + taxAmount + deliveryCharge;
+
+        setSummary({
+          total,
+          taxRate,
+          taxAmount,
+          deliveryCharge,
+          final,
+          value: valueInput,
+        });
+      }
+
+    }
+  }, [setting, distanceValue]);
 
 
   useEffect(() => {
@@ -66,7 +144,11 @@ export default function OrderCategory(props) {
           destination: clientLocation,
           travelMode: window.google.maps.TravelMode.DRIVING,
         })
-        .then((result) => setDirectionsResponse(result))
+        .then((result) => {
+          setDirectionsResponse(result)
+          const distanceInMeters = result.routes[0].legs[0].distance.value;
+          setDistanceValue(distanceInMeters / 1000);
+        })
         .catch((err) => console.log("Route error:", err));
     }
   }, [shopLocation, clientLocation]);
@@ -74,36 +156,69 @@ export default function OrderCategory(props) {
   const handleScriptLoad = () => setIsLoaded(true);
 
   const handleConfirm = () => {
-    const { selectedAttribute, inputValue } = router.query;
-
     if (!shopLocation || !clientLocation) {
-      return alert("Please ensure both shop and client locations are loaded");
+      return props.toaster({ type: "error", message: "Please ensure both shop and client locations are loaded" });
     }
-
-    console.log("data", shopLocation, clientLocation, selectedShop, shopAddress, clientAddress, inputValue, selectedAttribute, selectedDate);
-
-
-    // router.push({
-    //   pathname: "/Order/cart",
-    //   query: {
-    //     shopid: selectedShop?._id,
-    //     shopAddress,
-    //     shopLat: shopLocation.lat,
-    //     shopLng: shopLocation.lng,
-    //     clientAddress,
-    //     clientLat: clientLocation.lat,
-    //     clientLng: clientLocation.lng,
-    //     selectedAttribute,
-    //     inputValue,
-    //     description,
-    //     selectedDate: selectedDate || "",
-    //   },
-    // });
+    if (!attribute) {
+      return props.toaster({ type: "error", message: "Please ensure Attribute is selected" });
+    }
+    setCheckoutVisible(true);
   };
+
+  const orderPlace = async () => {
+    try {
+      props.loader(true);
+
+      const Location = {
+        type: "Point",
+        coordinates: [clientLocation.lng, clientLocation.lat],
+      }
+      const data = {
+        price: summary?.final?.toFixed(0),
+        product: router.query.productid,
+        productname: router.query.productName,
+        vendor: router.query.shopid,
+        location: Location,
+        address: clientAddress,
+        selectedAtribute: attribute,
+      };
+
+      if (summary?.value) data.inputvalue = summary?.value
+      if (selectedDate) data.sheduledate = selectedDate
+      if (description) data.description = description
+
+      const res = await Api("post", "createOrder", data, {});
+
+      if (res?.status) {
+        localStorage.removeItem("selectedAttribute");
+        localStorage.removeItem("input");
+        props.loader(false);
+        setCheckoutVisible(false)
+        setOrderStatus({
+          show: true,
+          success: true,
+          message: "Your order has been placed successfully!",
+        });
+      } else {
+        setOrderStatus({
+          show: true,
+          success: false,
+          message: "Order failed! Please try again.",
+        });
+      }
+
+
+    } catch (err) {
+      console.error("Order creation failed:", err);
+      props.toaster({ type: "error", message: res?.message || "Order placed failed!" })
+      props.loader(false);
+    }
+  };
+
+
 
   return (
     <div>
-      {/* Hero Section */}
       <div className="relative bg-[url('/Image/construction.jpg')] bg-cover bg-center h-[60vh]">
         <div className="absolute inset-0 bg-black/70 flex flex-col justify-center items-center">
           <p className="text-white font-semibold text-4xl md:text-6xl">
@@ -112,7 +227,7 @@ export default function OrderCategory(props) {
         </div>
       </div>
 
-      {/* Map Section */}
+
       <div className="bg-custom-black py-10">
         <div className="text-center text-3xl font-semibold pb-8 text-white">
           Selected Shop
@@ -135,28 +250,17 @@ export default function OrderCategory(props) {
                   styles: [{ elementType: "geometry", stylers: [{ color: "#1e293b" }] }],
                 }}
               >
-                {/* Shop Marker */}
+
                 <Marker
                   position={shopLocation}
-                  icon={{
-                    url: "data:image/svg+xml;base64," + btoa(`
-                      <svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='#10b981' stroke='#fff' stroke-width='2'>
-                        <path d='M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0116 0Z'/>
-                        <circle cx='12' cy='10' r='3'/>
-                      </svg>`),
-                  }}
+                  icon="http://maps.google.com/mapfiles/ms/icons/red-dot.png"
                 />
-                {/* Client Marker */}
+
                 <Marker
                   position={clientLocation}
-                  icon={{
-                    url: "data:image/svg+xml;base64," + btoa(`
-                      <svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='#ef4444' stroke='#fff' stroke-width='2'>
-                        <path d='M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0116 0Z'/>
-                        <circle cx='12' cy='10' r='3'/>
-                      </svg>`),
-                  }}
+                  icon="http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
                 />
+
                 {directionsResponse && (
                   <DirectionsRenderer
                     directions={directionsResponse}
@@ -227,6 +331,68 @@ export default function OrderCategory(props) {
             Confirm Order
           </button>
         </div>
+
+        <Checkout
+          open={checkoutVisible}
+          onClose={() => setCheckoutVisible(false)}
+          selectedAttribute={attribute}
+          location={clientAddress}
+          summary={summary}
+          onPlaceOrder={orderPlace}
+        />
+
+        {orderStatus.show && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl shadow-2xl p-6 w-[90%] md:w-[400px] text-center animate-fadeIn">
+              {/* Icon */}
+              <div className="flex justify-center mb-3">
+                {orderStatus.success ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-16 w-16 text-green-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-16 w-16 text-red-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                )}
+              </div>
+
+              {/* Title */}
+              <h2 className={`text-2xl font-semibold ${orderStatus.success ? "text-green-600" : "text-red-600"}`}>
+                {orderStatus.success ? "Order Successful!" : "Order Failed"}
+              </h2>
+
+              {/* Message */}
+              <p className="text-gray-700 mt-2 mb-5">{orderStatus.message}</p>
+
+              {/* OK Button */}
+              <button
+                onClick={() => {
+                  router.push("/Order/myOrder");
+                  setOrderStatus({ ...orderStatus, show: false })
+                }}
+                className={`px-10 py-2.5 rounded-lg text-white font-medium ${orderStatus.success ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
+                  } transition`}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        )}
+
+
 
       </div>
     </div>

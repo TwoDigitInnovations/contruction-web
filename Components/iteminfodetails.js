@@ -20,16 +20,19 @@ const ProductDetail = ({
     const handleNext = () => {
         const selectedProductData = {
             productid: productdetail?._id,
+            productName:productdetail?.name,
             shopid: selectedShop?._id,
-            attribute: selectedAttribute,
-            input: inputValue,
         };
+
+        localStorage.setItem("selectedAttribute", JSON.stringify(selectedAttribute));
+        localStorage.setItem("input", inputValue);
 
         router.push({
             pathname: "/Order/orderCategory",
             query: selectedProductData,
         });
     };
+
 
 
     const isNextDisabled =
